@@ -1,15 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://glwwjmtptqxhdorxsuah.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_Zw5KvVQTxGEWHp2lfy4mHQ_XbbDXuS_';
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_Zw5KvVQTXGEWHp2lfy4mHQ_XbbDXuS_';
 
 export const getSafeSupabase = () => {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key || !url.startsWith('http') || url.includes('placeholder')) {
+  try {
+    if (!supabaseUrl || !supabaseAnonKey || !supabaseUrl.startsWith('http')) {
+      return null;
+    }
+    return createClient(supabaseUrl, supabaseAnonKey);
+  } catch (err) {
+    console.error('Supabase initialization error:', err);
     return null;
   }
-  return createClient(url, key);
 };
