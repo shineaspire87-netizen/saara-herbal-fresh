@@ -1,5 +1,7 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { getSafeSupabase } from '@/lib/supabase';
 import { OrderData } from '@/types';
 
 export async function POST(req: NextRequest) {
@@ -16,11 +18,12 @@ export async function POST(req: NextRequest) {
     console.log(`[Order Processing] Order #${orderData.orderCode} received for ${orderData.customer.fullName}`);
 
     let dbSaved = false;
+    const supabaseClient = getSafeSupabase();
 
     // If Supabase is configured, record in database
-    if (isSupabaseConfigured && supabase) {
+    if (supabaseClient) {
       try {
-        const { data: orderRecord, error: orderError } = await supabase
+        const { data: orderRecord, error: orderError } = await supabaseClient
           .from('orders')
           .insert([
             {
@@ -55,7 +58,7 @@ export async function POST(req: NextRequest) {
             total_price: item.total,
           }));
 
-          const { error: itemsError } = await supabase
+          const { error: itemsError } = await supabaseClient
             .from('order_items')
             .insert(itemsToInsert);
 
